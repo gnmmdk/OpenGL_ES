@@ -15,5 +15,9 @@ void main(){
     //变量 接收像素值
     //texure2D 采样器 采集 aCoord的像素
     //赋值给gl_FragColor就可以了
-    gl_FragColor = texture2D(vTexture,aCoord);
+//    gl_FragColor = texture2D(vTexture,aCoord);
+    //305911公式
+    vec4 rgba = texture2D(vTexture,aCoord);
+    float gray = (0.30*rgba.r+0.59*rgba.g+0.11*rgba.b);
+    gl_FragColor = vec4(gray,gray,gray,1.0);
 }

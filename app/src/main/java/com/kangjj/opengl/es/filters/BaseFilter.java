@@ -20,6 +20,8 @@ public class BaseFilter {
     protected int vCoord;
     protected int vMatrix;
     protected int vTexture;
+    protected int mHeight;
+    protected int mWidth;
 
     public BaseFilter(Context context, int vertexSourceId, int fragmentSourceId) {
         mVertexSourceId = vertexSourceId;
@@ -31,6 +33,15 @@ public class BaseFilter {
                 1.0f, 1.0f,
         };
         vertexData = BufferHelper.getFloatBuffer(VERTEX);
+
+        //后摄：顺时针旋转90度
+//            float[] TEXTURE = {
+//            1.0f, 1.0f,
+//            1.0f, 0.0f,
+//            0.0f, 1.0f,
+//            0.0f, 0.0f
+//        };
+        //前摄：逆时针旋转90度后镜像
         float[] TEXTURE = {
                 0.0f, 1.0f,
                 1.0f, 1.0f,
@@ -60,5 +71,46 @@ public class BaseFilter {
         vMatrix = glGetAttribLocation(mProgramId,"vMatrix");
         //片元
         vTexture = glGetUniformLocation(mProgramId,"vTexture");
+    }
+
+    public void release(){
+        glDeleteProgram(mProgramId);
+    }
+
+    public void onReady(int width,int height){
+        mWidth = width;
+        mHeight = height;
+    }
+
+    public int onDrawFrame(int textureID){
+        //1. 设置视窗
+        glViewport(0,0,mWidth,mHeight);
+        // 2 使用着色器程序
+        glUseProgram(mProgramId);
+        //渲染 传值
+        // ①顶点数据
+        vertexData.position(0);
+        glVertexAttribPointer(vPosition,2,GL_FLOAT,false,0,vertexData);
+        // 传值后激活
+        glEnableVertexAttribArray(vPosition);
+
+        //② 纹理坐标
+        textureData.position(0);
+        glVertexAttribPointer(vCoord,2,GL_FLOAT,false,0,textureData);
+        //传值后激活
+        glEnableVertexAttribArray(vCoord);
+
+        //片元，vTexture
+        //激活图层
+        glActiveTexture(GL_TEXTURE);
+        //绑定
+        glBindTexture(GL_TEXTURE_2D,textureID);
+        //传递参数
+        glUniform1i(vTexture,0);
+
+        //通过opengl绘制
+        glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+        return textureID;
+
     }
 }

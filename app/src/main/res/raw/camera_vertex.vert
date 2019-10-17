@@ -19,7 +19,7 @@ void main(){
     //内置变量 gl_Position ,我们把顶点数据赋值给这个变量 opengl就知道它要画什么形状了
     gl_Position = vPosition;
     //和设备有关
-    //aCoord = (vMatrix * vCoord).xy;  ??
+//    aCoord = (vMatrix * vCoord).xy;
     aCoord = vCoord.xy;
-    //aCoord =  vec2((vCoord*vMatrix).x,(vCoord*vMatrix).y); ??
+//    aCoord =  vec2((vCoord*vMatrix).x,(vCoord*vMatrix).y);
 }

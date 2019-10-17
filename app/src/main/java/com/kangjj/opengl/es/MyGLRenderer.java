@@ -5,6 +5,8 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 
+import com.kangjj.opengl.es.filters.CameraFilter;
+import com.kangjj.opengl.es.filters.ScreenFilter;
 import com.kangjj.opengl.es.utils.CameraHelper;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -19,8 +21,8 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
     private CameraHelper mCameraHelper;
     private SurfaceTexture mSurfaceTexture;
     private int[] mTextureID;
-//    private CameraFilter mCameraFilter;
-//    private ScreenFilter mScreenFilter;
+    private CameraFilter mCameraFilter;
+    private ScreenFilter mScreenFilter;
 
 
     public MyGLRenderer(MyGLSurfaceView glSurfaceView) {
@@ -36,13 +38,15 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
         glGenTextures(mTextureID.length,mTextureID,0);
         mSurfaceTexture = new SurfaceTexture(mTextureID[0]);
         mSurfaceTexture.setOnFrameAvailableListener(this);
-        //TODO
+        mScreenFilter = new ScreenFilter(mGLSurfaceView.getContext());
+        mCameraFilter = new CameraFilter(mGLSurfaceView.getContext());
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         mCameraHelper.startPreview(mSurfaceTexture);
-        //TODO
+        mCameraFilter.onReady(width,height);
+        mScreenFilter.onReady(width,height);
     }
 
     @Override
@@ -58,7 +62,14 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
         mSurfaceTexture.updateTexImage();
         float[] mtx = new float[16];
         mSurfaceTexture.getTransformMatrix(mtx);
-        //TODO
+        mCameraFilter.setMatrix(mtx);
+        //mTextureID[0]: 摄像头的, 先渲染到FBO
+        int textureId = mCameraFilter.onDrawFrame(mTextureID[0]);
+        //滤镜特效
+        //textureId = xxxFilter.onDrawFrame(textureId);
+        //textureId = xxxFilter.onDrawFrame(textureId);
+        //......
+        mScreenFilter.onDrawFrame(textureId);
     }
 
     @Override
