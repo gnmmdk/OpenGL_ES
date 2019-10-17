@@ -42,6 +42,18 @@ public class BaseFilter {
 //            0.0f, 0.0f
 //        };
         //前摄：逆时针旋转90度后镜像
+//        float[] TEXTURE = {
+//                0.0f, 1.0f,
+//                0.0f, 0.0f,
+//                1.0f, 1.0f,
+//                1.0f, 0.0f
+//        };
+//        float[] TEXTURE = {
+//                0.0f, 0.0f,
+//                0.0f, 1.0f,
+//                1.0f, 0.0f,
+//                1.0f, 1.0f,
+//        };
         float[] TEXTURE = {
                 0.0f, 1.0f,
                 1.0f, 1.0f,
@@ -52,7 +64,7 @@ public class BaseFilter {
         init(context);
     }
 
-    private void init(Context context) {
+    protected void init(Context context) {
         //顶点着色器代码
         String vertexSource = TextResourceReader.readTextFileFromResource(context,mVertexSourceId);
         //片元着色器代码
@@ -68,7 +80,7 @@ public class BaseFilter {
         //定点
         vPosition = glGetAttribLocation(mProgramId,"vPosition");
         vCoord = glGetAttribLocation(mProgramId,"vCoord");
-        vMatrix = glGetAttribLocation(mProgramId,"vMatrix");
+        vMatrix = glGetUniformLocation(mProgramId,"vMatrix");
         //片元
         vTexture = glGetUniformLocation(mProgramId,"vTexture");
     }
