@@ -3,11 +3,17 @@ package com.kangjj.opengl.es;
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.opengl.EGL14;
+import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import com.kangjj.opengl.es.filters.CameraFilter;
 import com.kangjj.opengl.es.filters.ScreenFilter;
+import com.kangjj.opengl.es.record.MyMediaRecorder;
 import com.kangjj.opengl.es.utils.CameraHelper;
+
+import java.io.IOException;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -23,6 +29,7 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
     private int[] mTextureID;
     private CameraFilter mCameraFilter;
     private ScreenFilter mScreenFilter;
+    private MyMediaRecorder mMediaRecorder;
 
 
     public MyGLRenderer(MyGLSurfaceView glSurfaceView) {
@@ -40,6 +47,8 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
         mSurfaceTexture.setOnFrameAvailableListener(this);
         mScreenFilter = new ScreenFilter(mGLSurfaceView.getContext());
         mCameraFilter = new CameraFilter(mGLSurfaceView.getContext());
+        EGLContext eglContext = EGL14.eglGetCurrentContext();           //渲染线程的EGLContext
+        mMediaRecorder = new MyMediaRecorder(480, 800, "sdcard/kangjjTest.mp4", eglContext, mGLSurfaceView.getContext());
     }
 
     @Override
@@ -70,10 +79,31 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
         //textureId = xxxFilter.onDrawFrame(textureId);
         //......
         mScreenFilter.onDrawFrame(textureId);
+
+        //录制视频（将图像进行编码）
+        mMediaRecorder.encodeFrame(textureId,mSurfaceTexture.getTimestamp());
     }
 
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
         mGLSurfaceView.requestRender();
+    }
+
+    public void onSurfaceDestroyed() {
+        mCameraHelper.stopPreview();
+    }
+
+    public void startRecording(float speed) {
+        Log.e("MyGLRender", "startRecording");
+        try {
+            mMediaRecorder.start(speed);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopRecording() {
+        Log.e("MyGLRender", "stopRecording");
+        mMediaRecorder.stop();
     }
 }
