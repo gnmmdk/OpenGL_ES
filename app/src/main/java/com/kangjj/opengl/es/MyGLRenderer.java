@@ -8,10 +8,12 @@ import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import com.kangjj.opengl.es.face.FaceTrack;
 import com.kangjj.opengl.es.filters.CameraFilter;
 import com.kangjj.opengl.es.filters.ScreenFilter;
 import com.kangjj.opengl.es.record.MyMediaRecorder;
 import com.kangjj.opengl.es.utils.CameraHelper;
+import com.kangjj.opengl.es.utils.FileUtil;
 
 import java.io.IOException;
 
@@ -20,7 +22,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import static android.opengl.GLES20.*;
 
-class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
+class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener,Camera.PreviewCallback {
 
     private final MyGLSurfaceView mGLSurfaceView;
     private final int mCameraID = Camera.CameraInfo.CAMERA_FACING_FRONT;
@@ -30,15 +32,22 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
     private CameraFilter mCameraFilter;
     private ScreenFilter mScreenFilter;
     private MyMediaRecorder mMediaRecorder;
+    private FaceTrack mFaceTrack;
 
+    private static final String SDCARD = "/sdcard";
+    private static final String FRONTALFACE = "lbpcascade_frontalface.xml";
 
     public MyGLRenderer(MyGLSurfaceView glSurfaceView) {
         this.mGLSurfaceView = glSurfaceView;
+        FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(),FRONTALFACE,
+                SDCARD+"/"+FRONTALFACE);
+        //TODO copy
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mCameraHelper = new CameraHelper((Activity) mGLSurfaceView.getContext(),mCameraID,480,800);
+        mCameraHelper.setPreviewCallback(this);
         //准备画布
         mTextureID = new int[1];
         //通过opengl创建一个纹理的id
@@ -53,8 +62,13 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        //创建跟踪器 TODO add seeta
+        mFaceTrack = new FaceTrack(SDCARD+"/"+FRONTALFACE,mCameraHelper);
+        mFaceTrack.startTrack();
+
         mCameraHelper.startPreview(mSurfaceTexture);
         mCameraFilter.onReady(width,height);
+        //TODO
         mScreenFilter.onReady(width,height);
     }
 
@@ -91,6 +105,7 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
 
     public void onSurfaceDestroyed() {
         mCameraHelper.stopPreview();
+        mFaceTrack.stopTrack();
     }
 
     public void startRecording(float speed) {
@@ -105,5 +120,10 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
     public void stopRecording() {
         Log.e("MyGLRender", "stopRecording");
         mMediaRecorder.stop();
+    }
+
+    @Override
+    public void onPreviewFrame(byte[] data, Camera camera) {
+        mFaceTrack.detector(data);
     }
 }

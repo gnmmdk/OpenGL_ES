@@ -150,8 +150,9 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
         }
         mWidth = size.width;
         mHeight = size.height;
+        Log.d(TAG, "预览分辨率 size.width:" + size.width + " size.height:" + size.height);
+        Log.d(TAG, "预览分辨率 mWidth:" + mWidth + " mHeight:" + mHeight);
         parameters.setPreviewSize(mWidth, mHeight);
-        Log.d(TAG, "预览分辨率 width:" + size.width + " height:" + size.height);
     }
 
 
@@ -185,19 +186,20 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        switch (mRotation) {
-            case Surface.ROTATION_0:
-                rotation90(data);
-                break;
-            case Surface.ROTATION_90: // 横屏 左边是头部(home键在右边)
-                break;
-            case Surface.ROTATION_270:// 横屏 头部在右边
-                break;
-        }
+//        switch (mRotation) {
+//            case Surface.ROTATION_0:
+//                rotation90(data);
+//                break;
+//            case Surface.ROTATION_90: // 横屏 左边是头部(home键在右边)
+//                break;
+//            case Surface.ROTATION_270:// 横屏 头部在右边
+//                break;
+//        }//这里注释掉是放到jni层做处理了
         // data数据依然是倒的
         if (mPreviewCallback != null) {
-//            mPreviewCallback.onPreviewFrame(data, camera);
-            mPreviewCallback.onPreviewFrame(bytes, camera);
+            //到native层使用opencv提供的函数处理摄像头角度问题
+            mPreviewCallback.onPreviewFrame(data, camera);
+//            mPreviewCallback.onPreviewFrame(bytes, camera);
         }
         camera.addCallbackBuffer(buffer);
     }
@@ -248,6 +250,10 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
 
     public void setOnChangedSizeListener(OnChangedSizeListener listener) {
         mOnChangedSizeListener = listener;
+    }
+
+    public int getCameraId() {
+        return mCameraId;
     }
 
     public interface OnChangedSizeListener {
