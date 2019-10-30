@@ -62,6 +62,14 @@ public class BaseFilter {
         };
         textureData = BufferHelper.getFloatBuffer(TEXTURE);
         init(context);
+        changeTextureData();
+    }
+
+    /**
+     * 修改纹理坐标 textureData（有需求可以重写该方法）
+     */
+    protected void changeTextureData() {
+
     }
 
     protected void init(Context context) {
