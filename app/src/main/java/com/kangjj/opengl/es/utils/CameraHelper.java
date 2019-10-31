@@ -61,8 +61,14 @@ public class CameraHelper implements SurfaceHolder.Callback, Camera.PreviewCallb
         try {
             //获得camera对象
             mCamera = Camera.open(mCameraId);
+//            Camera.Parameters mParameters = mCamera.getParameters();
             //配置camera的属性
             Camera.Parameters parameters = mCamera.getParameters();
+//            List<Camera.Size> supportedPictureSizes = parameters.getSupportedPictureSizes();
+//            for (Camera.Size supportedPictureSize : supportedPictureSizes) {
+//                Log.e(TAG,"Camera supportedPictureSize width="+supportedPictureSize.width+" height="+supportedPictureSize.height);
+//            }
+
             //设置预览数据格式为nv21
             parameters.setPreviewFormat(ImageFormat.NV21);
             //这是摄像头宽、高

@@ -1,5 +1,6 @@
 package com.kangjj.opengl.es;
 
+import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mGLSurfaceView = findViewById(R.id.my_gl_sruface_view);
         mRecordButton = findViewById(R.id.btn_record);
+
+
         mRecordButton.setOnRecordListener(new MyRecordButton.OnRecordListener() {
             @Override
             public void onStartRecording() {

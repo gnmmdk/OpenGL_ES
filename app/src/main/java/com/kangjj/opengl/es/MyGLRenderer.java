@@ -25,7 +25,7 @@ import static android.opengl.GLES20.*;
 class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener,Camera.PreviewCallback {
 
     private final MyGLSurfaceView mGLSurfaceView;
-    private final int mCameraID = Camera.CameraInfo.CAMERA_FACING_FRONT;
+    private final int mCameraID = Camera.CameraInfo.CAMERA_FACING_BACK;
     private CameraHelper mCameraHelper;
     private SurfaceTexture mSurfaceTexture;
     private int[] mTextureID;
@@ -46,7 +46,7 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        mCameraHelper = new CameraHelper((Activity) mGLSurfaceView.getContext(),mCameraID,480,800);
+        mCameraHelper = new CameraHelper((Activity) mGLSurfaceView.getContext(),mCameraID,720,480);
         mCameraHelper.setPreviewCallback(this);
         //准备画布
         mTextureID = new int[1];

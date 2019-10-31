@@ -29,6 +29,7 @@ public class MyMediaRecorder {
     private boolean isStart;
     private MyEGL mEGL;
     private int index;
+    private long lastTimestampUs;
 
     /**
      * 在onSurfaceCreated时进行实例化
@@ -190,6 +191,12 @@ public class MyMediaRecorder {
                 }
                 if(bufferInfo.size!=0){
                     bufferInfo.presentationTimeUs = (long)(bufferInfo.presentationTimeUs / mSpeed);
+                    //presentationTimeUs xxxx < lastTimestampUs  xxx
+                    //时间戳比上一次的要小，这判断一下
+                    if (bufferInfo.presentationTimeUs <= lastTimestampUs) {
+                        bufferInfo.presentationTimeUs = (long) (lastTimestampUs + 1_000_000 / 30 / mSpeed);
+                    }
+                    lastTimestampUs = bufferInfo.presentationTimeUs;
                     //偏移位置
                     outputBuffer.position(bufferInfo.offset);
                     //可读写的总长度

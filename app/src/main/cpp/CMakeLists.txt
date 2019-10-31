@@ -10,8 +10,11 @@ add_library(
         FaceTrack.cpp
 )
 
+add_subdirectory(FaceAlignment)
+
 target_link_libraries( 
         native-lib
         opencv_java4
+        seeta_fa_lib
         log
 )
