@@ -18,9 +18,9 @@ public class FaceTrack {
     private long self;
     private Face mFace;
 
-    public FaceTrack(String model,CameraHelper cameraHelper){
+    public FaceTrack(String model,String seeta,CameraHelper cameraHelper){
         this.mCameraHelper = cameraHelper;
-        self = native_create(model);
+        self = native_create(model,seeta);
 
         mHandlerThread = new HandlerThread("FaceTrack");
         mHandlerThread.start();
@@ -35,6 +35,11 @@ public class FaceTrack {
                 }
             }
         };
+    }
+
+
+    public Face getFace() {
+        return mFace;
     }
 
     public void startTrack() {
@@ -61,7 +66,7 @@ public class FaceTrack {
 
     private native Face native_detector(long self, byte[] data, int cameraId, int width, int height);
 
-    private native long native_create(String model);
+    private native long native_create(String model,String setta);
 
 
     private native void native_start(long self);

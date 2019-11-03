@@ -6,10 +6,12 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_kangjj_opengl_es_face_FaceTrack_native_1create(JNIEnv *env, jobject thiz, jstring model_) {
+Java_com_kangjj_opengl_es_face_FaceTrack_native_1create(JNIEnv *env, jobject thiz, jstring model_,jstring setta_) {
     const char *model = env->GetStringUTFChars(model_,0);
-    FaceTrack * faceTrack = new FaceTrack(model);
+    const char *setta = env->GetStringUTFChars(setta_,0);
+    FaceTrack * faceTrack = new FaceTrack(model,setta);
     env->ReleaseStringUTFChars(model_,model);
+    env->ReleaseStringUTFChars(setta_,setta);
     return reinterpret_cast<jlong>(faceTrack);
 }
 extern "C"
@@ -53,7 +55,7 @@ Java_com_kangjj_opengl_es_face_FaceTrack_native_1detector(JNIEnv *env, jobject t
     __android_log_print(ANDROID_LOG_INFO, "FaceTrack", "ret=%d",ret);
     if(ret){
         jclass clazz = env->FindClass("com/kangjj/opengl/es/face/Face");
-        jmethodID construct = env->GetMethodID(clazz,"<init>","(IIII[F)V");
+        jmethodID construct = env->GetMethodID(clazz, "<init>", "(IIII[F)V");
         int size = ret * 2;
         //创建java的flaot数组
         jfloatArray floatArray = env->NewFloatArray(size);

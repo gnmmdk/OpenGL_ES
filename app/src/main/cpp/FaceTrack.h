@@ -7,6 +7,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include "FaceAlignment/include/face_alignment.h"
 
 using namespace std;
 using namespace cv;
@@ -39,7 +40,7 @@ class FaceTrack {
 public:
     // model: opencv的模型
     // seeta：seeta的模型
-    FaceTrack(const char *model);
+    FaceTrack(const char *model,const char *seeta);
 
     void detector(Mat src,vector<Rect2f> &rects);
 
@@ -49,6 +50,7 @@ public:
 
 private:
     Ptr<DetectionBasedTracker> tracker;
+    Ptr<seeta::FaceAlignment> faceAlignment;
 };
 
 

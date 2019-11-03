@@ -9,6 +9,7 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 import com.kangjj.opengl.es.face.FaceTrack;
+import com.kangjj.opengl.es.filters.BigEyeFilter;
 import com.kangjj.opengl.es.filters.CameraFilter;
 import com.kangjj.opengl.es.filters.ScreenFilter;
 import com.kangjj.opengl.es.record.MyMediaRecorder;
@@ -25,23 +26,25 @@ import static android.opengl.GLES20.*;
 class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener,Camera.PreviewCallback {
 
     private final MyGLSurfaceView mGLSurfaceView;
-    private final int mCameraID = Camera.CameraInfo.CAMERA_FACING_BACK;
+    private final int mCameraID = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private CameraHelper mCameraHelper;
     private SurfaceTexture mSurfaceTexture;
     private int[] mTextureID;
     private CameraFilter mCameraFilter;
     private ScreenFilter mScreenFilter;
+    private BigEyeFilter mBigEyeFilter;
     private MyMediaRecorder mMediaRecorder;
     private FaceTrack mFaceTrack;
 
     private static final String SDCARD = "/sdcard";
     private static final String FRONTALFACE = "lbpcascade_frontalface.xml";
+    private static final String SETTA_FA = "seeta_fa_v1.1.bin";
 
     public MyGLRenderer(MyGLSurfaceView glSurfaceView) {
         this.mGLSurfaceView = glSurfaceView;
         FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(),FRONTALFACE,
                 SDCARD+"/"+FRONTALFACE);
-        //TODO copy
+        FileUtil.copyAssets2SDCard(mGLSurfaceView.getContext(),SETTA_FA,SDCARD+"/"+SETTA_FA);
     }
 
     @Override
@@ -55,6 +58,7 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
         mSurfaceTexture = new SurfaceTexture(mTextureID[0]);
         mSurfaceTexture.setOnFrameAvailableListener(this);
         mScreenFilter = new ScreenFilter(mGLSurfaceView.getContext());
+        mBigEyeFilter = new BigEyeFilter(mGLSurfaceView.getContext());
         mCameraFilter = new CameraFilter(mGLSurfaceView.getContext());
         EGLContext eglContext = EGL14.eglGetCurrentContext();           //渲染线程的EGLContext
         mMediaRecorder = new MyMediaRecorder(480, 800, "sdcard/kangjjTest.mp4", eglContext, mGLSurfaceView.getContext());
@@ -62,13 +66,13 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        //创建跟踪器 TODO add seeta
-        mFaceTrack = new FaceTrack(SDCARD+"/"+FRONTALFACE,mCameraHelper);
+        //创建跟踪器
+        mFaceTrack = new FaceTrack(SDCARD+"/"+FRONTALFACE,SDCARD+"/"+SETTA_FA,mCameraHelper);
         mFaceTrack.startTrack();
 
         mCameraHelper.startPreview(mSurfaceTexture);
         mCameraFilter.onReady(width,height);
-        //TODO
+        mBigEyeFilter.onReady(width,height);
         mScreenFilter.onReady(width,height);
     }
 
@@ -92,6 +96,8 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
         //textureId = xxxFilter.onDrawFrame(textureId);
         //textureId = xxxFilter.onDrawFrame(textureId);
         //......
+        mBigEyeFilter.setFace(mFaceTrack.getFace());
+        textureId = mBigEyeFilter.onDrawFrame(textureId);
         mScreenFilter.onDrawFrame(textureId);
 
         //录制视频（将图像进行编码）
