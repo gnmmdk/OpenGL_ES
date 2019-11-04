@@ -12,14 +12,14 @@ public class BaseFrameFilter extends BaseFilter {
 
     @Override
     protected void changeTextureData() {
-//        float[] TEXTURE={
-//            0.0f, 0.0f,
-//            1.0f, 0.0f,
-//            0.0f, 1.0f,
-//            1.0f, 1.0f,
-//        };
-//        textureData.clear();
-//        textureData.put(TEXTURE);
+        float[] TEXTURE={
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            0.0f, 1.0f,
+            1.0f, 1.0f,
+        };
+        textureData.clear();
+        textureData.put(TEXTURE);
     }
 
     public BaseFrameFilter(Context context, int vertexSourceId, int fragmentSourceId) {

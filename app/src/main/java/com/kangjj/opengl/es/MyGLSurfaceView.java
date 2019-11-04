@@ -68,4 +68,16 @@ public class MyGLSurfaceView extends GLSurfaceView {
     public void setSpeed(Speed speed) {
         this.mSpeed = speed;
     }
+
+    public void enableBigEye(boolean isChecked) {
+        mRenderer.enableBigEye(isChecked);
+    }
+
+    public void enableStick(boolean isChecked) {
+        mRenderer.enableStick(isChecked);
+    }
+
+    public void enableBeauty(boolean isChecked) {
+        mRenderer.enableBeauty(isChecked);
+    }
 }

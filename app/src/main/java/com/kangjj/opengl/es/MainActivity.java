@@ -4,6 +4,8 @@ import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +62,25 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        ((CheckBox)findViewById(R.id.chk_bigeye)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mGLSurfaceView.enableBigEye(isChecked);
+            }
+        });
+        ((CheckBox)findViewById(R.id.chk_stick)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mGLSurfaceView.enableStick(isChecked);
+            }
+        });
+        ((CheckBox)findViewById(R.id.chk_beauty)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mGLSurfaceView.enableBeauty(isChecked);
+            }
+        });
     }
 
 }
