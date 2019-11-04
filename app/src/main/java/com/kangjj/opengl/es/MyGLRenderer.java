@@ -13,6 +13,7 @@ import com.kangjj.opengl.es.filters.BeautyFilter;
 import com.kangjj.opengl.es.filters.BigEyeFilter;
 import com.kangjj.opengl.es.filters.CameraFilter;
 import com.kangjj.opengl.es.filters.ScreenFilter;
+import com.kangjj.opengl.es.filters.StickFilter;
 import com.kangjj.opengl.es.record.MyMediaRecorder;
 import com.kangjj.opengl.es.utils.CameraHelper;
 import com.kangjj.opengl.es.utils.FileUtil;
@@ -37,6 +38,7 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
     private BeautyFilter mBeautyFilter;
     private MyMediaRecorder mMediaRecorder;
     private FaceTrack mFaceTrack;
+    private StickFilter mStickFilter;
 
     private static final String SDCARD = "/sdcard";
     private static final String FRONTALFACE = "lbpcascade_frontalface.xml";
@@ -110,7 +112,10 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
             mBigEyeFilter.setFace(mFaceTrack.getFace());
             textureId = mBigEyeFilter.onDrawFrame(textureId);
         }
-        //TODO
+        if(null != mStickFilter){
+            mStickFilter.setFace(mFaceTrack.getFace());
+            textureId = mStickFilter.onDrawFrame(textureId);
+        }
         if(null != mBeautyFilter){
             textureId = mBeautyFilter.onDrawFrame(textureId);
         }
@@ -164,8 +169,19 @@ class MyGLRenderer implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvai
         });
     }
 
-    public void enableStick(boolean isChecked) {
-        //TODO
+    public void enableStick(final boolean isChecked) {
+        mGLSurfaceView.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                if(isChecked){
+                    mStickFilter = new StickFilter(mGLSurfaceView.getContext());
+                    mStickFilter.onReady(mWidth,mHeight);
+                }else{
+                    mStickFilter.release();
+                    mStickFilter = null;
+                }
+            }
+        });
     }
 
     public void enableBeauty(final boolean isChecked) {
